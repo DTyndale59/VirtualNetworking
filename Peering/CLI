@@ -1,0 +1,48 @@
+
+    ## Create virtual network peering connections
+    
+ 
+    az network vnet peering create \
+    --name SalesVNet-To-MarketingVNet \
+    --remote-vnet MarketingVNet \
+    --resource-group [sandbox resource group name] \
+    --vnet-name SalesVNet \
+    --allow-vnet-access
+    
+    
+    az network vnet peering create \
+    --name MarketingVNet-To-SalesVNet \
+    --remote-vnet SalesVNet \
+    --resource-group [sandbox resource group name] \
+    --vnet-name MarketingVNet \
+    --allow-vnet-access
+    
+    ## Now that you have connections between Sales and Marketing, create connections between Marketing and Research.
+    
+    ## Run the following command to create the reciprocal connection between ResearchVNet and MarketingVNet:
+    
+    
+    az network vnet peering create \
+    --name ResearchVNet-To-MarketingVNet \
+    --remote-vnet MarketingVNet \
+    --resource-group [sandbox resource group name] \
+    --vnet-name ResearchVNet \
+    --allow-vnet-access
+
+##Check the virtual network peering connections
+
+az network vnet peering list \
+    --resource-group [sandbox resource group name] \
+    --vnet-name SalesVNet \
+    --query "[].{Name:name, Resource:resourceGroup, PeeringState:peeringState, AllowVnetAccess:allowVirtualNetworkAccess}"\
+    --output table
+    
+    
+    ## Check effective routes
+    
+    az network nic show-effective-route-table \
+    --resource-group [sandbox resource group name] \
+    --name SalesVMVMNic \
+    --output table
+    
+    
