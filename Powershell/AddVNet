@@ -1,0 +1,50 @@
+##PowerShell
+
+## Create myVNet virtual network. ##
+New-AzVirtualNetwork -ResourceGroupName myResourceGroup -Name myVNet -Location eastus -AddressPrefix 10.0.0.0/16
+
+##View virtual networks and settings using PowerShell
+Get-AzVirtualNetwork -ResourceGroupName myResourceGroup | format-table Name, ResourceGroupName, Location
+
+Get-AzVirtualNetwork -ResourceGroupName myResourceGroup -Name myVNet
+
+## Add or remove an address range using PowerShell
+## Use Set-AzVirtualNetwork to update the address space of a virtual network.
+
+## Place the virtual network configuration into a variable. ##
+$virtualNetwork = Get-AzVirtualNetwork -ResourceGroupName myResourceGroup -Name myVNet
+
+## Remove the old address range. ##
+$virtualNetwork.AddressSpace.AddressPrefixes.Remove("10.0.0.0/16")
+
+## Add the new address range. ##
+$virtualNetwork.AddressSpace.AddressPrefixes.Add("10.1.0.0/16")
+
+## Update the virtual network. ##
+Set-AzVirtualNetwork -VirtualNetwork $virtualNetwork
+
+
+## Change DNS servers of a virtual network using PowerShell
+## Use Set-AzVirtualNetwork to update a virtual network with new address space.
+
+## Place the virtual network configuration into a variable. ##
+$virtualNetwork = Get-AzVirtualNetwork -ResourceGroupName myResourceGroup -Name myVNet
+## Add the IP address of the DNS server. ##
+$virtualNetwork.DhcpOptions.DnsServers.Add("10.0.0.10")
+## Update the virtual network. ##
+Set-AzVirtualNetwork -VirtualNetwork $virtualNetwork
+
+## Delete a virtual network using PowerShell
+## Use Remove-AzVirtualNetwork to delete a virtual network.
+
+Remove-AzVirtualNetwork -ResourceGroupName myResourceGroup -Name myVNet
+
+## Permissions
+## To perform tasks on virtual networks, your account must be assigned to the network contributor role or to a custom role that is assigned the appropriate actions listed in the following table:
+
+## Microsoft.Network/virtualNetworks/read	Read a virtual Network
+## Microsoft.Network/virtualNetworks/write	Create or update a virtual network
+## Microsoft.Network/virtualNetworks/delete	Delete a virtual network
+
+
+
