@@ -1,0 +1,50 @@
+## Deploy the network virtual appliance
+
+## Run the following command to get the ID of the NVA network interface.
+
+
+NICID=$(az vm nic list \
+    --resource-group [sandbox resource group name] \
+    --vm-name nva \
+    --query "[].{id:id}" --output tsv)
+
+echo $NICID
+
+## Run the following command to get the name of the NVA network interface.
+
+NICNAME=$(az vm nic show \
+    --resource-group [sandbox resource group name] \
+    --vm-name nva \
+    --nic $NICID \
+    --query "{name:name}" --output tsv)
+
+echo $NICNAME
+
+## Run the following command to enable IP forwarding for the network interface.
+
+az network nic update --name $NICNAME \
+    --resource-group [sandbox resource group name] \
+    --ip-forwarding true
+    
+    
+## Enable IP forwarding in the appliance
+    
+    NVAIP="$(az vm list-ip-addresses \
+    --resource-group [sandbox resource group name] \
+    --name nva \
+    --query "[].virtualMachine.network.publicIpAddresses[*].ipAddress" \
+    --output tsv)"
+
+echo $NVAIP
+
+## Run the following command to enable IP forwarding within the NVA.
+
+ssh -t -o StrictHostKeyChecking=no azureuser@$NVAIP 'sudo sysctl -w net.ipv4.ip_forward=1; exit;'
+
+
+
+
+
+
+
+    
