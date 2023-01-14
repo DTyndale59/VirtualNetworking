@@ -5,3 +5,66 @@ $lb.LoadBalancingRules[0].LoadDistribution = 'sourceIp'
 Set-AzLoadBalancer -LoadBalancer $lb
 
 
+## Create a load balancer
+
+##  Create a new public IP address.
+
+az network public-ip create \
+  --resource-group [sandbox resource group name] \
+  --allocation-method Static \
+  --name myPublicIP
+
+## Create the load balancer.
+
+az network lb create \
+  --resource-group [sandbox resource group name] \
+  --name myLoadBalancer \
+  --public-ip-address myPublicIP \
+  --frontend-ip-name myFrontEndPool \
+  --backend-pool-name myBackEndPool
+
+## To allow the load balancer to monitor the status of the healthcare portal, create a health probe. The health probe dynamically adds or removes VMs from the load balancer rotation based on their response to health checks.
+
+az network lb probe create \
+  --resource-group [sandbox resource group name] \
+  --lb-name myLoadBalancer \
+  --name myHealthProbe \
+  --protocol tcp \
+  --port 80  
+
+##  Now you need a load balancer rule that's used to define how traffic is distributed to the VMs. You define the front-end IP configuration for the incoming traffic and the back-end IP pool to receive the traffic, along with the required source and destination port. To make sure only healthy VMs receive traffic, you also define the health probe to use.
+
+az network lb rule create \
+  --resource-group [sandbox resource group name] \
+  --lb-name myLoadBalancer \
+  --name myHTTPRule \
+  --protocol tcp \
+  --frontend-port 80 \
+  --backend-port 80 \
+  --frontend-ip-name myFrontEndPool \
+  --backend-pool-name myBackEndPool \
+  --probe-name myHealthProbe
+
+## Connect the VMs to the back-end pool by updating the network interfaces you created in the script to use the back-end pool information.
+
+az network nic ip-config update \
+  --resource-group [sandbox resource group name] \
+  --nic-name webNic1 \
+  --name ipconfig1 \
+  --lb-name myLoadBalancer \
+  --lb-address-pools myBackEndPool
+
+az network nic ip-config update \
+  --resource-group [sandbox resource group name] \
+  --nic-name webNic2 \
+  --name ipconfig1 \
+  --lb-name myLoadBalancer \
+  --lb-address-pools myBackEndPool
+
+##   Run the following command to get the public IP address of the load balancer and the URL for your website.
+
+echo http://$(az network public-ip show \
+                --resource-group [sandbox resource group name] \
+                --name myPublicIP \
+                --query ipAddress \
+                --output tsv)
