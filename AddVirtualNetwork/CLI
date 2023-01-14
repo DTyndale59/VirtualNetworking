@@ -1,0 +1,71 @@
+
+## Create a virtual network using the Azure CLI
+
+## Use az network vnet create to create a virtual network.
+
+## Create myVNet virtual network with the default address space: 10.0.0.0/16. ##
+
+az network vnet create --resource-group myResourceGroup --name myVNet
+
+az network vnet create \
+    --resource-group [sandbox resource group name] \
+    --name CoreServicesVnet \
+    --address-prefixes 10.20.0.0/16 \
+    --location westus
+    
+## create the subnets that we need for the planned resources in the virtual network:
+    
+    az network vnet subnet create \
+    --resource-group [sandbox resource group name] \
+    --vnet-name CoreServicesVnet \
+    --name GatewaySubnet \
+    --address-prefixes 10.20.0.0/27
+
+az network vnet subnet create \
+    --resource-group [sandbox resource group name] \
+    --vnet-name CoreServicesVnet \
+    --name SharedServicesSubnet \
+    --address-prefixes 10.20.10.0/24
+
+az network vnet subnet create \
+    --resource-group [sandbox resource group name] \
+    --vnet-name CoreServicesVnet \
+    --name DatabaseSubnet \
+    --address-prefixes 10.20.20.0/24
+
+az network vnet subnet create \
+    --resource-group [sandbox resource group name] \
+    --vnet-name CoreServicesVnet \
+    --name PublicWebServiceSubnet \
+    --address-prefixes 10.20.30.0/24
+    
+##  View virtual networks and settings using the Azure CLI
+##  Use az network vnet list to list all virtual networks in a resource group.
+
+az network vnet list --resource-group myResourceGroup
+
+az network vnet subnet list \
+    --resource-group [sandbox resource group name] \
+    --vnet-name CoreServicesVnet \
+    --output table
+
+az network vnet show --resource-group myResourceGroup --name myVNet
+
+## Add or remove an address range using the Azure CLI
+## Use az network vnet update to update the address space of a virtual network.
+
+## Update the address space of myVNet virtual network with 10.1.0.0/16 address range (10.1.0.0/16 overrides any previous address ranges set in this virtual network). ## 
+
+az network vnet update --resource-group myResourceGroup --name myVNet --address-prefixes 10.1.0.0/16
+
+## Change DNS servers of a virtual network using the Azure CLI
+## Use az network vnet update to update the address space of a virtual network.
+
+## Update the virtual network with IP address of the DNS server. ## 
+
+az network vnet update --resource-group myResourceGroup --name myVNet --dns-servers 10.0.0.10
+
+## Delete a virtual network using the Azure CLI
+## Use az network vnet delete to delete a virtual network.
+
+az network vnet delete --resource-group myResourceGroup --name myVNet
